@@ -1,5 +1,6 @@
 
 # Importando arquivos
+from ast import expr
 from pyspark import SparkContext, SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
@@ -12,6 +13,7 @@ REGEX_INVOICE_N6 = r'^[0-9]{6}$'
 REGEX_INVOICE_N5 = r'^[0-9]{5}$'
 REGEX_INTEGER  = r'[0-9]+'
 REGEX_ALPHA    = r'[a-zA-Z]+'
+REGEX_EMPTY_STR= r'[\t ]+$'
 
 # Funcoes auxiliares 
 def check_empty_column(col):
@@ -52,7 +54,8 @@ def online_retail_qa(df):
 
 # coluna Description
 	df = df.withColumn("qa_description",
-		  F.when(check_empty_column('Description'), 'M').otherwise("OK")
+		  F.when(check_empty_column('Description'), 'M')
+		   .when(F.col('Description').rlike(REGEX_EMPTY_STR),'F').otherwise("OK")
 		  )
 
 
@@ -106,7 +109,17 @@ def online_retail_proc(df):
 			F.when(F.col('Quantity').isNull(), 0)
 			 .when(F.col('Quantity') < 0, 0)
 			 .otherwise(F.col('Quantity')))
+	
+   # coluna Description
+
+	df = df.withColumn('Description',
+			F.when(
+				F.col('Description').rlike(REGEX_EMPTY_STR), F.ltrim(F.col('Description')))
+				 .otherwise(F.col('Description'))
+			)
+
 	return df
+
 
 # Perguntas
 
@@ -120,7 +133,6 @@ def pergunta1(df):
 
 # pergunta 2 
 def pergunta2(df):
-
 		print('Pergunta 2')
 		(df.where( F.col('StockCode').startswith('gift_0001'))
 	   	   .groupBy( F.month(F.col('InvoiceDate')).alias('month') )
@@ -161,6 +173,7 @@ def pergunta5(df):
 
 ## pergunta 6 
 def pergunta6(df):
+	print('pergunta 6')
 	(df.where(~F.col('StockCode').contains('C'))
 	   .groupBy(F.hour('InvoiceDate').alias('hora_invoice'))
 	   .agg(F.round(F.sum(F.expr('UnitPrice * Quantity')), 2).alias('sum_valor_hora'))
@@ -170,8 +183,9 @@ def pergunta6(df):
 	   )
 
 
-## pergunta 7 
+## pergunta 7
 def pergunta7(df):
+	print('pergunta 7') 
 	(df.where(~F.col('StockCode').contains('C'))
 	   .groupBy(F.month('InvoiceDate').alias('Month'))
 	   .agg(F.round(F.sum(F.expr('UnitPrice * Quantity')), 2).alias('sum_valor_mes'))
@@ -179,6 +193,78 @@ def pergunta7(df):
 	   .limit(1)
 	   .show()
 	   )
+
+def pergunta8(df):
+	print('Pergunta 8')
+	ano = (df.groupBy( F.year(F.col('InvoiceDate')).alias('year') )
+	   	    	   .agg( F.round(F.sum(F.expr('Quantity * UnitPrice')), 2).alias('value') )
+	   			   .orderBy(F.col('value').desc())
+				   .select('year')
+				   .limit(1)
+				   .collect()[0][0]
+			)
+
+	produto_mes = (df.where((~F.col('StockCode').contains('C')) &
+							  (F.year('InvoiceDate') ==  int(ano)))
+					   .groupBy('Description', F.month('InvoiceDate').alias('month'),F.year('InvoiceDate').alias('year'))
+					   .agg(F.round(F.sum(F.expr('UnitPrice * Quantity')), 2).alias('produto_mais_vendido'))
+					   .orderBy(F.col('produto_mais_vendido').desc())
+					   .dropDuplicates(['month'])
+					   .show()
+					   )
+
+def pergunta9(df):
+	print('Pergunta 9')
+
+	(df.groupBy('Country')
+	   .agg(F.round(F.sum(F.expr('UnitPrice * Quantity')), 2).alias('valor_tot_country'))
+	   .orderBy(F.col('valor_tot_country').desc())
+	   .limit(1)
+	   .show())	
+
+
+def pergunta_10(df):
+	print('Pergunta 10')
+	(df.where(F.col('StockCode') == 'M')
+	   .groupBy('Country')
+	   .agg(F.round(F.sum(F.expr('UnitPrice * Quantity')), 2).alias('value'))
+	   .orderBy(F.col('value').desc())
+	   .limit(1)
+	   .show())
+
+
+
+def pergunta11(df):
+	print('Pergunta 11')
+	(df.where(~F.col('InvoiceNo').contains('C'))
+	   .groupBy('InvoiceNo')
+	   .agg(F.round(F.sum(F.expr('UnitPrice * Quantity')), 2).alias('value_invoice'))
+	   .orderBy(F.col('value_invoice').desc())
+	   .limit(1)
+	   .show())
+
+
+
+
+def pergunta12(df):
+	print('Pergunta 13')
+	(df.where(~F.col('InvoiceNo').contains('C'))
+	   .select('InvoiceNo', 'Quantity')
+	   .orderBy(F.col('Quantity').desc())
+	   .limit(1)
+	   .show())
+
+
+
+def pergunta13(df):
+	print('Pergunta 13')
+
+	(df.where(~F.col('CustomerID').isNull())
+	   .groupBy('CustomerID')
+	   .count()
+	   .orderBy(F.col('count').desc())
+	   .limit(1)
+	   .show())
 
 
 
@@ -195,10 +281,16 @@ if __name__ == "__main__":
 	df_quality = online_retail_qa(df)   #  dataframe qualidade
 	df_proc    = online_retail_proc(df) #  dataframe transformacao
 
-	pergunta1(df_proc)
-	pergunta2(df_proc)
-	pergunta3(df_proc)
-	pergunta4(df_proc)
-	pergunta5(df_proc)
-	pergunta6(df_proc)
-	pergunta7(df_proc)
+	#pergunta1(df_proc)
+	#pergunta2(df_proc)
+	#pergunta3(df_proc)
+	#pergunta4(df_proc)
+	#pergunta5(df_proc)
+	#pergunta6(df_proc)
+	#pergunta7(df_proc)
+	#pergunta8(df_proc)
+	#pergunta9(df_proc)
+	#pergunta10(df_proc)
+	#pergunta11(df_proc)
+	#pergunta12(df_proc)
+	#pergunta13(df_proc)
