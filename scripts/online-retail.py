@@ -116,7 +116,7 @@ def pergunta1(df):
 	(df.where(F.col('StockCode').rlike('^gift_0001'))
 	   .agg(F.round(F.sum(F.expr('Quantity * UnitPrice')), 2).alias('Sum gift cards'))
 	   .show())
-	print('---------------------------------------------------------------------------')
+
 
 # pergunta 2 
 def pergunta2(df):
@@ -157,8 +157,6 @@ def pergunta5(df):
 		    .orderBy(F.col('Quantity').desc())
 		    .dropDuplicates(['month'])
 		    .show())
-
-	print('---------------------------------------------------------------------------')
 
 
 ## pergunta 6 
