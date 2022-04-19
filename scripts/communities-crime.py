@@ -178,6 +178,10 @@ def community_proc(dataframe):
 		F.when(check_empty_column('population'),0)
 		 .otherwise(F.col('population')))
 
+	dataframe = dataframe.withColumn('state',
+		F.when(check_empty_column('state'),0)
+		 .otherwise(F.col('state')))
+
 	return dataframe
 	
 	
@@ -255,6 +259,29 @@ def pergunta_11(dataframe):
     dataframe.agg(F.round(F.corr('medFamInc', 'ViolentCrimesPerPop'), 2).alias('correlation')).show()
 
 
+	
+def pergunta_12(df):
+	print('pergunta 12')
+	ethnicity_columns = ['racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp']
+	df = df.withColumn('max_value', (
+					F.greatest(F.col('racepctblack'),
+							   F.col('racePctWhite'),
+							   F.col('racePctAsian'),
+							   F.col('racePctHisp')    
+							  ))
+	)
+
+	cond = "F.when" + ".when".join(["(F.col('" + c + "') == F.col('max_value'), F.lit('" + c + "'))" for c in ethnicity_columns])
+
+	df = df.withColumn('ViolentCrimesPerEthnicity',(
+						eval(cond)
+	))
+
+	return (df.select('communityname', 'ViolentCrimesPerEthnicity', 'ViolentCrimesPerPop' )
+			  .sort('ViolentCrimesPerPop', ascending =False).show()
+			  )	
+
+
 
 
 
@@ -273,7 +300,7 @@ if __name__ == "__main__":
 	df_qa = community_qa(df)  # Quality
 	df_proc = community_proc(df) # Transformacao
 	#pergunta_1(df_proc)
-	#pergunta_2(df_proc)
+	pergunta_2(df_proc)
 	#pergunta_3(df_proc)
 	#pergunta_4(df_proc)
 	#pergunta_5(df_proc)
@@ -283,6 +310,7 @@ if __name__ == "__main__":
 	#pergunta_9(df_proc)
 	#pergunta_10(df_proc)
 	#pergunta_11(df_proc)
+	pergunta_12(df_proc)
 	
 
 
