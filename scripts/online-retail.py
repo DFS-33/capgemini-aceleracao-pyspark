@@ -280,6 +280,7 @@ if __name__ == "__main__":
 
 	df_quality = online_retail_qa(df)   #  dataframe qualidade
 	df_proc    = online_retail_proc(df) #  dataframe transformacao
+	print(df_quality.columns)
 
 	#pergunta1(df_proc)
 	#pergunta2(df_proc)
