@@ -230,7 +230,7 @@ def pergunta_5 (dataframe):
 
 
 
-def pergunta_6 (dataframe):
+def pergunta_6 (dataframe)
 	(dataframe.where(F.col('agePct12t21').isNotNull())
 	   .groupBy(F.col('state'),F.col('communityname'))
 	   .agg(F.round(F.sum(F.col('agePct12t21')),2).alias('max_young'))
@@ -259,33 +259,6 @@ def pergunta_11(dataframe):
     dataframe.agg(F.round(F.corr('medFamInc', 'ViolentCrimesPerPop'), 2).alias('correlation')).show()
 
 
-	
-def pergunta_12(df):
-	print('pergunta 12')
-	ethnicity_columns = ['racepctblack', 'racePctWhite', 'racePctAsian', 'racePctHisp']
-	df = df.withColumn('max_value', (
-					F.greatest(F.col('racepctblack'),
-							   F.col('racePctWhite'),
-							   F.col('racePctAsian'),
-							   F.col('racePctHisp')    
-							  ))
-	)
-
-	cond = "F.when" + ".when".join(["(F.col('" + c + "') == F.col('max_value'), F.lit('" + c + "'))" for c in ethnicity_columns])
-
-	df = df.withColumn('ViolentCrimesPerEthnicity',(
-						eval(cond)
-	))
-
-	return (df.select('communityname', 'ViolentCrimesPerEthnicity', 'ViolentCrimesPerPop' )
-			  .sort('ViolentCrimesPerPop', ascending =False).show()
-			  )	
-
-
-
-
-
-
 
 if __name__ == "__main__":
 	sc = SparkContext()
@@ -300,7 +273,7 @@ if __name__ == "__main__":
 	df_qa = community_qa(df)  # Quality
 	df_proc = community_proc(df) # Transformacao
 	#pergunta_1(df_proc)
-	pergunta_2(df_proc)
+	#pergunta_2(df_proc)
 	#pergunta_3(df_proc)
 	#pergunta_4(df_proc)
 	#pergunta_5(df_proc)
