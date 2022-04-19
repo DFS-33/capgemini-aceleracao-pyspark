@@ -192,14 +192,12 @@ def community_proc(dataframe):
 def pergunta_1(dataframe):
 	(dataframe.where(F.col('PolicOperBudg').isNotNull())
 	   .groupBy(F.col('state'),F.col('communityname'))
-	   .agg(F.round(F.sum(F.col('PolicOperBudg')),2).alias('budg_cop'))
 	   .orderBy(F.col('budg_cop').desc())
 	   .show())
 
 def pergunta_2(dataframe):
 	(dataframe.where(F.col('ViolentCrimesPerPop').isNotNull())
 	   .groupBy(F.col('state'),F.col('communityname'))
-	   .agg(F.round(F.sum(F.col('ViolentCrimesPerPop')),2).alias('ViolentCrimesPerPop'))
 	   .orderBy(F.col('ViolentCrimesPerPop').desc())
 	   .show(10))
 
@@ -208,7 +206,6 @@ def pergunta_2(dataframe):
 def pergunta_3(dataframe):
 	(dataframe.where(F.col('population').isNotNull())
 	   .groupBy(F.col('state'), F.col('communityname'))
-	   .agg(F.round(F.sum(F.col('population')),2).alias('population'))
 	   .orderBy(F.col('population').desc())
 	   .show())
 	
@@ -216,7 +213,6 @@ def pergunta_3(dataframe):
 def pergunta_4(dataframe):
 	(dataframe.where(F.col('blackPerCap').isNotNull())
 	   .groupBy(F.col('state'), F.col('communityname'))
-	   .agg(F.round(F.sum(F.col('blackPerCap')),2).alias("BlackPeople"))
 	   .orderBy(F.col('BlackPeople').desc())
 	   .show())
 
@@ -224,7 +220,6 @@ def pergunta_4(dataframe):
 def pergunta_5 (dataframe):
 	(dataframe.where(F.col('pctWWage').isNotNull())
 	   .groupBy(F.col('state'), F.col('communityname'))
-	   .agg(F.round(F.sum(F.col('pctWWage')),2).alias('max_salary'))
 	   .orderBy(F.col('max_salary').desc())
 	   .show())
 
@@ -233,7 +228,6 @@ def pergunta_5 (dataframe):
 def pergunta_6 (dataframe):
 	(dataframe.where(F.col('agePct12t21').isNotNull())
 	   .groupBy(F.col('state'),F.col('communityname'))
-	   .agg(F.round(F.sum(F.col('agePct12t21')),2).alias('max_young'))
 	   .orderBy(F.col('max_young').desc())
 	   .show())
 
