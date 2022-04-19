@@ -230,7 +230,7 @@ def pergunta_5 (dataframe):
 
 
 
-def pergunta_6 (dataframe)
+def pergunta_6 (dataframe):
 	(dataframe.where(F.col('agePct12t21').isNotNull())
 	   .groupBy(F.col('state'),F.col('communityname'))
 	   .agg(F.round(F.sum(F.col('agePct12t21')),2).alias('max_young'))
@@ -277,13 +277,13 @@ if __name__ == "__main__":
 	#pergunta_3(df_proc)
 	#pergunta_4(df_proc)
 	#pergunta_5(df_proc)
-	#pergunta_6(df_proc)
+	pergunta_6(df_proc)
 	#pergunta_7(df_proc)
 	#pergunta_8(df_proc)
 	#pergunta_9(df_proc)
 	#pergunta_10(df_proc)
 	#pergunta_11(df_proc)
-	pergunta_12(df_proc)
+	#pergunta_12(df_proc)
 	
 
 
