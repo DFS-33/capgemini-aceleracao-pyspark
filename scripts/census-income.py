@@ -11,7 +11,7 @@ REGEX_INVOICE_N6 = r'^[0-9]{6}$'
 REGEX_INVOICE_N5 = r'^[0-9]{5}$'
 REGEX_INTEGER  = r'[0-9]+'
 REGEX_ALPHA    = r'[a-zA-Z]+'
-REGEX_EMPTY_STR= r'[\t ]+$'
+REGEX_EMPTY_STR= r'[\t ]+$
 
 # Funcoes auxiliares 
 def check_empty_column(col):
