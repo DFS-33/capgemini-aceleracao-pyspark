@@ -11,7 +11,7 @@ REGEX_INVOICE_N6 = r'^[0-9]{6}$'
 REGEX_INVOICE_N5 = r'^[0-9]{5}$'
 REGEX_INTEGER  = r'[0-9]+'
 REGEX_ALPHA    = r'[a-zA-Z]+'
-REGEX_EMPTY_STR= r'[\t ]+$
+REGEX_EMPTY_STR= r'[\t ]+$'
 
 # Funcoes auxiliares 
 def check_empty_column(col):
@@ -149,23 +149,71 @@ def pergunta_8(dataframe):
 
 
 def pergunta_9(dataframe):
-	pass
+
+    (dataframe.where(F.col('self-employed').contains('self-employed'))
+     .groupBy(F.col('education'), F.col('sex'), F.col('race'))
+     .agg(F.count(F.col('self-employed')).alias('count'))
+     .orderBy(F.col('count').desc())
+     .limit(1)
+     .show()
+     )
 
 
 
 def pergunta_10(dataframe):
-	pass
-
+	  (dataframe.groupBy('casado-status')
+     .agg(F.count(F.col('casado-status')).alias('total'))
+     .withColumn('razao', F.round((F.col('total')/df.count()), 2))
+     .show()
+     )
 
 
 
 def pergunta_11(dataframe):
-	pass
+	  (dataframe.where(F.col('casado-status').rlike('nao-casado'))
+     .groupBy(F.col('race'), F.col('casado-status'))
+     .agg(F.count(F.col('race')).alias('count'))
+     .orderBy(F.col('count').desc())
+     .limit(1)
+     .show()
+     )
 
 
 
 def pergunta_12(dataframe):
-	pass
+	(dataframe.groupBy(F.col('income'), F.col('casado-status'))
+     		  .agg(F.count(F.col('casado-status')).alias('count'))
+      		  .orderBy(F.col('count').desc())
+			  .limit(2)
+              .show()
+     )
+
+
+def pergunta_13(dataframe):
+	(dataframe.groupBy(F.col('income'), F.col('sex'))
+			  .agg(F.count(F.col('sex')).alias('count'))
+			  .orderBy(F.col('count').desc())
+			  .limit(2)
+			  .show()
+     )
+	
+
+def pergunta_14(dataframe):
+	(dataframe.where(F.col('native-country').isNotNull())
+			  .groupBy(F.col('native-country'), F.col('income'))
+			  .agg(F.count(F.col('native-country')).alias('count'))
+			  .orderBy(F.col('count').desc())
+			  .show()
+     )
+
+def pergunta15(dataframe):
+    (dataframe.groupBy('white-ratio')
+       		  .count()
+              .withColumn('ratio', F.round((F.col('count')/df.count()), 2))
+              .show()
+	
+	)
+
 
 if __name__ == "__main__":
 	sc = SparkContext()
